@@ -1,0 +1,12 @@
+# The arrows will be removed after this many ticks (set to 0 for instant action)
+time: 60
+
+# If this is true, an arrow item will be dropped when the arrow entity is removed
+drop: true
+
+# If this is true, the plugin will only remove burning arrows
+burningOnly: false
+
+# If this is true, arrows on fire will be put out. No arrows will be removed.
+# This overrides all other configuration settings, except time: the arrow will be put out after that many ticks (set to 0 for instant action)
+stopFire: false
