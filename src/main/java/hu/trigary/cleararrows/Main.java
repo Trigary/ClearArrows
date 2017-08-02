@@ -12,62 +12,66 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-@SuppressWarnings ("unused")
 public class Main extends JavaPlugin implements Listener {
+	@Override
+	public void onEnable() {
+		saveDefaultConfig();
+		FileConfiguration config = getConfig();
+		
+		time = config.getInt("time");
+		drop = config.getBoolean("drop");
+		burningOnly = config.getBoolean("burningOnly");
+		stopFire = config.getBoolean("stopFire");
+		
+		getServer().getPluginManager().registerEvents(this, this);
+	}
+	
 	private int time;
 	private boolean drop;
 	private boolean burningOnly;
 	private boolean stopFire;
 	
-	@Override
-	public void onEnable () {
-		saveDefaultConfig ();
-		FileConfiguration config = getConfig ();
-		
-		time = config.getInt ("time");
-		drop = config.getBoolean ("drop");
-		burningOnly = config.getBoolean ("burningOnly");
-		stopFire = config.getBoolean ("stopFire");
-		
-		getServer ().getPluginManager ().registerEvents (this, this);
-	}
 	
-	@SuppressWarnings ("unused")
-	@EventHandler (ignoreCancelled = true)
-	public void onProjectileHit (ProjectileHitEvent event) {
-		Projectile projectile = event.getEntity ();
-		if (projectile instanceof Arrow) {
-			if (projectile.getFireTicks () == 0) {
-				if (!burningOnly && !stopFire) {
-					handleRemove (projectile);
+	
+	@EventHandler(ignoreCancelled = true)
+	private void onArrowHit(ProjectileHitEvent event) {
+		Projectile projectile = event.getEntity();
+		if (!(projectile instanceof Arrow)) {
+			return;
+		}
+		
+		if (projectile.getFireTicks() == 0) {
+			if (!burningOnly && !stopFire) {
+				handleRemoval(projectile);
+			}
+		} else {
+			if (stopFire) {
+				if (time > 0) {
+					Bukkit.getScheduler().runTaskLater(this, () -> projectile.setFireTicks(0), time);
+				} else {
+					projectile.setFireTicks(0);
 				}
 			} else {
-				if (stopFire) {
-					if (time > 0) {
-						Bukkit.getScheduler ().runTaskLater (this, () -> projectile.setFireTicks (0), time);
-					} else {
-						projectile.setFireTicks (0);
-					}
-				} else {
-					handleRemove (projectile);
-				}
+				handleRemoval(projectile);
 			}
 		}
 	}
 	
-	private void handleRemove (Entity entity) {
+	
+	
+	private void handleRemoval(Entity entity) {
 		if (time > 0) {
-			Bukkit.getScheduler ().runTaskLater (this, () -> remove (entity), time);
+			Bukkit.getScheduler().runTaskLater(this, () -> removeNow(entity), time);
 		} else {
-			remove (entity);
+			removeNow(entity);
 		}
 	}
 	
-	private void remove (Entity entity) {
-		if (entity.isValid ()) {
-			entity.remove ();
+	private void removeNow(Entity entity) {
+		if (entity.isValid()) {
+			entity.remove();
 			if (drop) {
-				entity.getLocation ().getWorld ().dropItem (entity.getLocation (), new ItemStack (Material.ARROW, 1));
+				entity.getLocation().getWorld().dropItem(entity.getLocation(), new ItemStack(Material.ARROW, 1));
 			}
 		}
 	}
