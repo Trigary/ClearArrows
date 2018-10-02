@@ -13,6 +13,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin implements Listener {
+	private int time;
+	private boolean drop;
+	private boolean burningOnly;
+	private boolean stopFire;
+	
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
@@ -25,13 +30,6 @@ public class Main extends JavaPlugin implements Listener {
 		
 		getServer().getPluginManager().registerEvents(this, this);
 	}
-	
-	private int time;
-	private boolean drop;
-	private boolean burningOnly;
-	private boolean stopFire;
-	
-	
 	
 	@EventHandler(ignoreCancelled = true)
 	private void onArrowHit(ProjectileHitEvent event) {
@@ -56,8 +54,6 @@ public class Main extends JavaPlugin implements Listener {
 			}
 		}
 	}
-	
-	
 	
 	private void handleRemoval(Entity entity) {
 		if (time > 0) {
